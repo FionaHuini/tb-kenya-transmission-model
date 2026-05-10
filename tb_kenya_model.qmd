@@ -14,9 +14,88 @@ format:
 
 ## Background
 
+
+Tuberculosis (TB) remains a leading cause of infectious disease mortality globally, 
+with Kenya classified among the 30 high TB burden countries by the World Health 
+Organization (WHO). In 2022, Kenya reported an estimated incidence of 268 cases 
+per 100,000 population, with treatment success rates of approximately 87% [@who2023].
+
+A key feature of TB epidemiology is the long latent period between initial infection 
+and progression to active disease. Only 5–10% of latently infected individuals 
+develop active TB in their lifetime, with risk elevated by HIV co-infection, 
+malnutrition, and immunosuppression [@pai2016]. This latent dynamic makes TB 
+fundamentally different from directly transmitted diseases and requires explicit 
+compartmental representation in transmission models.
+
+Kenya's national TB program operates under the **End TB Strategy**, targeting a 
+90% reduction in TB deaths and 80% reduction in incidence by 2030 relative to 
+2015 baselines. Achieving these targets requires understanding the drivers of 
+transmission and projecting the impact of intervention scale-up.
+
+This analysis develops and calibrates a compartmental TB transmission model to 
+Kenya's observed epidemic trajectory (2000–2022) and evaluates three intervention 
+scenarios against End TB 2030 targets.
 ## Methods
 
+###Model Structure
+
+Here, we have developed a deterministic compartmental model with five states: 
+Susceptible (**S**), Latent (**E**), Infectious (**I**), On Treatment (**T**), 
+and Recovered (**R**). The model accounts for TB's characteristically long 
+latent period and the possibility of relapse following recovery.
+
+The system of ordinary differential equations (ODEs) governing transitions 
+between compartments is implemented in `R/model.R` and solved numerically 
+using the `deSolve` package.
 ## Results
+
+### Baseline Simulation
+```{r}
+#| label: fig-baseline
+#| fig-cap: "Baseline TB compartment dynamics in Kenya (2000–2022)"
+
+source("R/model.R")
+library(ggplot2)
+
+# Parameters — literature values
+params <- c(
+  beta    = 0.8,
+  k       = 0.1,
+  mu      = 0.016,
+  tau     = 0.8,
+  delta   = 0.15,
+  gamma_r = 0.85,
+  rho     = 0.02
+)
+
+N0 <- 31000000
+
+initial_state <- c(
+  S = N0 * 0.80,
+  E = N0 * 0.15,
+  I = N0 * 0.04,
+  T = N0 * 0.005,
+  R = N0 * 0.005
+)
+
+times <- seq(0, 22, by = 0.1)
+
+result <- run_tb_model(params, initial_state, times)
+
+library(tidyverse)
+
+result |>
+  pivot_longer(-time, names_to = "Compartment", values_to = "Count") |>
+  ggplot(aes(x = time + 2000, y = Count / 1000, color = Compartment)) +
+  geom_line(linewidth = 0.9) +
+  labs(
+    x = "Year",
+    y = "Population (thousands)",
+    title = "TB Compartment Dynamics in Kenya 2000–2022",
+    color = "Compartment"
+  ) +
+  theme_minimal()
+```
 
 ## Discussion
 
