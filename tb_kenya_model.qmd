@@ -1,0 +1,25 @@
+---
+title: "Modelling TB Transmission Dynamics in Kenya (2000–2022)"
+author: "Fiona Huini"
+date: "2026-05-10"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    theme: cosmo
+    self-contained: true
+
+---
+
+## Background
+
+## Methods
+
+## Results
+
+## Discussion
+
+## Limitations
+
+## References
