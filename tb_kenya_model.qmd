@@ -59,15 +59,18 @@ library(ggplot2)
 
 # Parameters — literature values
 params <- c(
-  beta    = 0.8,
-  k       = 0.1,
-  mu      = 0.016,
-  tau     = 0.8,
-  delta   = 0.15,
-  gamma_r = 0.85,
-  rho     = 0.02
+  beta    = 0.15,   # NTLD Annual Report 2022
+  k       = 0.10,   # NTLD Strategic Plan 2019-2023
+  mu      = 0.0147, # KNBS Statistical Abstract 2023
+  tau     = 0.68,   # NTLD Annual Report 2022
+  delta   = 0.50,   # NTLD Annual Report 2021
+  gamma_r = 0.75,   # NTLD Annual Report 2021
+  rho     = 0.003   # NTLD Latent TB Policy 2020
 )
 
+# Compute and print R0 with literature parameters
+R0_literature <- compute_R0(params)
+cat("R0 with literature parameters:", round(R0_literature, 3), "\n")
 N0 <- 31000000
 
 initial_state <- c(
