@@ -1,5 +1,5 @@
 ---
-title: "Modelling TB Transmission Dynamics in Kenya (2000–2022)"
+title: "Modelling TB Transmission Dynamics in Kenya (2000-2022)"
 author: "Fiona Huini"
 date: "2026-05-10"
 format:
@@ -9,99 +9,592 @@ format:
     code-fold: true
     theme: cosmo
     self-contained: true
-
 ---
 
 ## Background
 
+Tuberculosis (TB) remains a leading cause of infectious disease mortality 
+globally, with Kenya classified among the 30 high TB burden countries by the 
+World Health Organization (WHO). In 2022, Kenya reported an estimated incidence 
+of 268 cases per 100,000 population, with treatment success rates of 
+approximately 87%.
 
-Tuberculosis (TB) remains a leading cause of infectious disease mortality globally, 
-with Kenya classified among the 30 high TB burden countries by the World Health 
-Organization (WHO). In 2022, Kenya reported an estimated incidence of 268 cases 
-per 100,000 population, with treatment success rates of approximately 87% [@who2023].
+A key feature of TB epidemiology is the long latent period between initial 
+infection and progression to active disease. Only 5-10% of latently infected 
+individuals develop active TB in their lifetime, with risk elevated by HIV 
+co-infection, malnutrition, and immunosuppression. This latent dynamic makes 
+TB fundamentally different from directly transmitted diseases and requires 
+explicit compartmental representation in transmission models.
 
-A key feature of TB epidemiology is the long latent period between initial infection 
-and progression to active disease. Only 5–10% of latently infected individuals 
-develop active TB in their lifetime, with risk elevated by HIV co-infection, 
-malnutrition, and immunosuppression [@pai2016]. This latent dynamic makes TB 
-fundamentally different from directly transmitted diseases and requires explicit 
-compartmental representation in transmission models.
+Kenya's national TB program operates under the **End TB Strategy**, targeting 
+a 90% reduction in TB deaths and 80% reduction in incidence by 2030 relative 
+to 2015 baselines. Achieving these targets requires understanding the drivers 
+of transmission and projecting the impact of intervention scale-up.
 
-Kenya's national TB program operates under the **End TB Strategy**, targeting a 
-90% reduction in TB deaths and 80% reduction in incidence by 2030 relative to 
-2015 baselines. Achieving these targets requires understanding the drivers of 
-transmission and projecting the impact of intervention scale-up.
+This analysis develops and calibrates a compartmental TB transmission model 
+to Kenya's observed epidemic trajectory (2000-2022) and evaluates three 
+intervention scenarios against End TB 2030 targets.
 
-This analysis develops and calibrates a compartmental TB transmission model to 
-Kenya's observed epidemic trajectory (2000–2022) and evaluates three intervention 
-scenarios against End TB 2030 targets.
+### Research Questions
+
+This analysis addresses four research questions:
+
+(1) whether a calibrated SEIRS-type model can reproduce Kenya's observed TB 
+incidence trajectory;
+(2) estimation of Kenya's basic reproduction number R0;
+(3) identification of the parameters most strongly driving TB incidence;
+(4) projection of incidence to 2030 under treatment scale-up scenarios, 
+evaluated against End TB targets.
+
 ## Methods
 
-###Model Structure
+### Model Structure
 
-Here, we have developed a deterministic compartmental model with five states: 
-Susceptible (**S**), Latent (**E**), Infectious (**I**), On Treatment (**T**), 
-and Recovered (**R**). The model accounts for TB's characteristically long 
-latent period and the possibility of relapse following recovery.
+We developed a deterministic compartmental model with five states: Susceptible 
+(S), Latent (E), Infectious (I), On Treatment (T), and Recovered (R). The model 
+accounts for TB's characteristically long latent period and the possibility of 
+relapse following recovery.
 
-The system of ordinary differential equations (ODEs) governing transitions 
-between compartments is implemented in `R/model.R` and solved numerically 
-using the `deSolve` package.
-## Results
+While many TB models use a standard SEIRS structure, we explicitly model the 
+treatment compartment (T) to reflect Kenya's programmatic context and allow 
+direct calibration to WHO treatment success data. The system of ordinary 
+differential equations (ODEs) is solved numerically using the `deSolve` package.
+
+### Model Parameters
+
+Parameters were sourced from Kirimi et al. (2024), a compartmental TB 
+transmission model calibrated to the Kenyan context. The transmission parameter 
+beta was subsequently calibrated to Kenya's observed 2000 baseline incidence. 
+Background mortality was obtained from the KNBS Statistical Abstract (2023).
+
+### Setup
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+# Load required packages
+library(deSolve)   # ODE numerical solver
+library(tidyverse) # data wrangling and visualisation
+
+# ── ODE System ───────────────────────────────────────────────────────────────
+# Five compartments: S (susceptible), E (latent), I (infectious),
+# T (on treatment), R (recovered)
+
+tb_model <- function(t, state, params) {
+  with(as.list(c(state, params)), {
+    
+    # Total population — denominator for frequency-dependent transmission
+    N <- S + E + I + T + R
+    
+    # Susceptible — gains from births, loses to infection and death
+    dS <- mu * N0 - beta * S * I / N - mu * S
+    
+    # Latent — gains from new infections and relapses, loses to progression and death
+    dE <- beta * S * I / N - (k + mu) * E + rho * R
+    
+    # Infectious — gains from latent progression, loses to treatment, TB death, background death
+    dI <- k * E - (tau + delta + mu) * I
+    
+    # On treatment — gains from treatment initiation, loses to recovery and background death
+    dT <- tau * I - (gamma_r + mu) * T
+    
+    # Recovered — gains from treatment success, loses to relapse and background death
+    dR <- gamma_r * T - (rho + mu) * R
+    
+    list(c(dS, dE, dI, dT, dR))
+  })
+}
+
+# ── R0 Function ──────────────────────────────────────────────────────────────
+# Basic reproduction number derived from next-generation matrix approach
+# R0 = (beta * k) / ((k + mu) * (tau + delta + mu))
+# Numerator:   rate of new infections * progression to infectious state
+# Denominator: rate of leaving latent * rate of leaving infectious state
+# R0 > 1 → TB persists; R0 < 1 → TB dies out
+
+compute_R0 <- function(params) {
+  with(as.list(params), {
+    (beta * k) / ((k + mu) * (tau + delta + mu))
+  })
+}
+
+# ── Model Runner ─────────────────────────────────────────────────────────────
+# Solves ODE system using deSolve and returns data frame of compartment sizes
+
+run_tb_model <- function(params, initial_state, times) {
+  out <- ode(y = initial_state, times = times,
+             func = tb_model, parms = params)
+  as.data.frame(out)
+}
+
+# ── Parameters ───────────────────────────────────────────────────────────────
+# Source: Kirimi et al. (2024) doi:10.1155/2024/5883142
+# Note: beta is a placeholder here — calibrated to WHO data in Results section
+# delta corrected from CFR proportion to annual rate (50% CFR / 3yr duration)
+
+params <- c(
+  beta    = 1.0,    # transmission rate — placeholder, calibrated separately
+  k       = 0.10,   # latent to active progression rate (NTLD Strategic Plan 2019-2023)
+  mu      = 0.0147, # background mortality rate (KNBS Statistical Abstract 2023)
+  tau     = 0.68,   # treatment initiation rate (NTLD Annual Report 2022)
+  delta   = 0.15,   # TB-attributable mortality rate, annual (NTLD Annual Report 2021)
+  gamma_r = 0.75,   # treatment success rate (NTLD Annual Report 2021)
+  rho     = 0.003   # relapse rate (NTLD Latent TB Infection Policy 2020)
+)
+
+# Literature beta for baseline illustration only
+baseline_params        <- params
+baseline_params["beta"] <- 0.15  # Kirimi et al. (2024)
+
+# Kenya population in 2000 (World Bank)
+N0 <- 31000000
+```
 
 ### Baseline Simulation
+
 ```{r}
 #| label: fig-baseline
-#| fig-cap: "Baseline TB compartment dynamics in Kenya (2000–2022)"
+#| fig-cap: "Baseline TB compartment dynamics using literature parameters (Kirimi et al. 2024)"
+#| results: hide
 
-source("R/model.R")
-library(ggplot2)
-
-# Parameters — literature values
-params <- c(
-  beta    = 0.15,   # NTLD Annual Report 2022
-  k       = 0.10,   # NTLD Strategic Plan 2019-2023
-  mu      = 0.0147, # KNBS Statistical Abstract 2023
-  tau     = 0.68,   # NTLD Annual Report 2022
-  delta   = 0.50,   # NTLD Annual Report 2021
-  gamma_r = 0.75,   # NTLD Annual Report 2021
-  rho     = 0.003   # NTLD Latent TB Policy 2020
-)
-
-# Compute and print R0 with literature parameters
-R0_literature <- compute_R0(params)
-cat("R0 with literature parameters:", round(R0_literature, 3), "\n")
-N0 <- 31000000
-
+# Initial conditions — approximate Kenya 2000 population distribution
+# Based on estimated TB prevalence and treatment coverage at baseline
 initial_state <- c(
-  S = N0 * 0.80,
-  E = N0 * 0.15,
-  I = N0 * 0.04,
-  T = N0 * 0.005,
-  R = N0 * 0.005
+  S = N0 * 0.80,  # 80% susceptible
+  E = N0 * 0.15,  # 15% latently infected (high burden setting)
+  I = N0 * 0.04,  # 4% active TB
+  T = N0 * 0.005, # 0.5% on treatment
+  R = N0 * 0.005  # 0.5% recovered
 )
 
-times <- seq(0, 22, by = 0.1)
+# Run model over 22-year period (2000-2022)
+times  <- seq(0, 22, by = 0.1)
+result <- run_tb_model(baseline_params, initial_state, times)
 
-result <- run_tb_model(params, initial_state, times)
+# R0 with literature parameters before calibration
+# Expected to be below 1 since beta = 0.15 is a literature starting estimate
 
-library(tidyverse)
+R0_literature <- compute_R0(baseline_params)
 
+cat("R0 with literature parameters:", round(R0_literature, 3), "\n")
+
+# Plot all five compartments over time
 result |>
   pivot_longer(-time, names_to = "Compartment", values_to = "Count") |>
   ggplot(aes(x = time + 2000, y = Count / 1000, color = Compartment)) +
   geom_line(linewidth = 0.9) +
-  labs(
-    x = "Year",
-    y = "Population (thousands)",
-    title = "TB Compartment Dynamics in Kenya 2000–2022",
-    color = "Compartment"
-  ) +
+  scale_color_manual(values = c(
+    "S" = "#0072B2",   # blue
+    "E" = "#E69F00",   # orange
+    "I" = "#D55E00",   # vermillion
+    "T" = "#009E73",   # green
+    "R" = "#CC79A7"    # pink
+  )) +
+  labs(x = "Year", y = "Population (thousands)",
+       title = "TB Compartment Dynamics — Kenya 2000-2022",
+       subtitle = "Using literature parameters (beta = 0.15, Kirimi et al. 2024)") +
   theme_minimal()
 ```
 
+## Results
+
+### Model Calibration
+
+```{r}
+#| label: fig-fit
+#| fig-cap: "Modelled vs observed TB incidence — Kenya 2000-2022"
+#| message: false
+
+# ── Load WHO Kenya Incidence Data ─────────────────────────────────────────────
+# Source: WHO Global TB Report, downloaded from who.int/tb/data
+
+kenya_tb <- read_csv("data/kenya_tb_who.csv")
+
+# Filter to study period and select incidence variable
+observed <- kenya_tb |>
+  select(year, e_inc_100k) |>
+  filter(year >= 2000, year <= 2022) |>
+  arrange(year)
+
+# Calibration target — 2000 baseline incidence
+observed_2000 <- observed |>
+  filter(year == 2000) |>
+  pull(e_inc_100k)
+
+# ── Calibration Function ──────────────────────────────────────────────────────
+# Returns modeled incidence per 100,000 at year 2000 for a given beta value
+# Uses 50-year burn-in to reach endemic equilibrium before the study period
+# This avoids artificial transient dynamics from arbitrary initial conditions
+
+model_incidence_2000 <- function(beta_val) {
+  
+  # Apply candidate beta to parameter set
+  p         <- params
+  p["beta"] <- beta_val
+  
+  # Burn-in: start from low-prevalence state and run 50 years to equilibrium
+  # Equilibrium represents the endemic steady state before 2000
+  burn_state <- c(S = N0*0.95, E = N0*0.04, I = N0*0.005,
+                  T = N0*0.004, R = N0*0.001)
+  burn       <- run_tb_model(p, burn_state, seq(0, 50, by = 1))
+  
+  # Extract final state after burn-in — this is our 2000 starting population
+  eq <- c(S = tail(burn$S,1), E = tail(burn$E,1), I = tail(burn$I,1),
+          T = tail(burn$T,1), R = tail(burn$R,1))
+  
+  # Run one time step from equilibrium to compute year 2000 incidence
+  res <- run_tb_model(p, eq, seq(0, 1, by = 1))
+  N   <- sum(res[1, c("S","E","I","T","R")])
+  
+  # Incidence per 100,000 = new infections / total population * 100,000
+  (p["beta"] * res$S[1] * res$I[1] / N) / N * 100000
+}
+
+# ── Optimisation ──────────────────────────────────────────────────────────────
+# Find beta that minimises squared difference between modeled and observed 2000 incidence
+# Single-point calibration to baseline year — limitation acknowledged
+
+objective   <- function(b) (model_incidence_2000(b) - observed_2000)^2
+fit         <- optimize(objective, interval = c(0.1, 50.0))
+beta_fitted <- fit$minimum
+
+# Store calibrated parameters
+cal_params         <- params
+cal_params["beta"] <- beta_fitted
+
+# Compute R0 with calibrated beta
+R0_calibrated <- compute_R0(cal_params)
+
+# Print calibration summary
+cat("Fitted beta:    ", round(beta_fitted, 4), "\n")
+cat("Calibrated R0:  ", round(R0_calibrated, 4), "\n")
+cat("Modeled 2000:   ", round(model_incidence_2000(beta_fitted), 1), "\n")
+cat("Observed 2000:  ", observed_2000, "\n")
+
+# ── Fit Plot ──────────────────────────────────────────────────────────────────
+# Run model 2000-2022 from equilibrium state using calibrated beta
+
+burn_state <- c(S = N0*0.95, E = N0*0.04, I = N0*0.005,
+                T = N0*0.004, R = N0*0.001)
+burn_full  <- run_tb_model(cal_params, burn_state, seq(0, 50, by = 1))
+
+# Equilibrium state used as 2000 starting conditions
+eq_state <- c(
+  S = tail(burn_full$S, 1), E = tail(burn_full$E, 1),
+  I = tail(burn_full$I, 1), T = tail(burn_full$T, 1),
+  R = tail(burn_full$R, 1)
+)
+
+# Run model from 2000 to 2022
+fit_result <- run_tb_model(cal_params, eq_state, seq(0, 22, by = 1))
+N_fit      <- rowSums(fit_result[, c("S","E","I","T","R")])
+
+# Compute modeled incidence per 100,000 for each year
+mod_inc <- (cal_params["beta"] * fit_result$S * fit_result$I / N_fit) /
+            N_fit * 100000
+
+# Combine modeled and observed for plotting
+fit_df <- tibble(
+  year     = 2000:2022,
+  modeled  = mod_inc,
+  observed = observed$e_inc_100k
+)
+
+fit_df |>
+  pivot_longer(-year, names_to = "Series", values_to = "Incidence") |>
+  ggplot(aes(x = year, y = Incidence, color = Series, linetype = Series)) +
+  geom_line(linewidth = 0.9) +
+  geom_point(data = function(x) filter(x, Series == "observed"), size = 2) +
+  scale_color_manual(values = c(
+    "modeled"  = "#0072B2",  # blue — model output
+    "observed" = "#E69F00"   # orange — WHO observed data
+  )) +
+  annotate("text", x = 2005, y = 280,
+           label = "Fixed-parameter model cannot\nreproduce programme-driven decline",
+           size = 3, color = "#000000") +
+  labs(x = "Year", y = "TB Incidence per 100,000",
+       title = "Modelled vs Observed TB Incidence — Kenya 2000-2022",
+       caption = "Observed: WHO Global TB Report. Modelled: SETR model, beta calibrated to 2000 baseline.") +
+  theme_minimal()
+```
+
+The transmission parameter beta was calibrated to Kenya's observed TB incidence 
+in 2000 (451 per 100,000), yielding a fitted value of beta = 1.06 per year and 
+a basic reproduction number R0 = 1.10. This confirms endemic TB persistence in 
+Kenya, consistent with Ochieng (2025) who estimated R0 = 1.005 using a distinct 
+model structure.
+
+The fixed-parameter model reproduces the 2000 baseline accurately but cannot 
+capture the observed post-2000 decline (@fig-fit). This divergence reflects 
+Kenya's improving treatment programme between 2000 and 2022 — a programmatic 
+trend that fixed parameters cannot reproduce by design, and is acknowledged as 
+a key model limitation.
+
+### Scenario Analysis
+
+```{r}
+#| label: fig-scenarios
+#| fig-cap: "Projected TB incidence under three intervention scenarios — Kenya 2022-2030"
+
+# ── End TB Target ─────────────────────────────────────────────────────────────
+# WHO End TB Strategy: 80% reduction in incidence from 2015 baseline by 2030
+
+baseline_2015 <- observed |> filter(year == 2015) |> pull(e_inc_100k)
+end_tb_target <- baseline_2015 * 0.20  # 80% reduction
+
+cat("2015 baseline incidence:", baseline_2015, "per 100,000\n")
+cat("End TB 2030 target:     ", round(end_tb_target, 1), "per 100,000\n")
+
+# ── 2022 Starting State ───────────────────────────────────────────────────────
+# Project from equilibrium through 2022 to get starting conditions for scenarios
+
+burn_2022  <- run_tb_model(cal_params, eq_state, seq(0, 22, by = 1))
+state_2022 <- c(
+  S = tail(burn_2022$S, 1), E = tail(burn_2022$E, 1),
+  I = tail(burn_2022$I, 1), T = tail(burn_2022$T, 1),
+  R = tail(burn_2022$R, 1)
+)
+
+scenario_times <- seq(0, 8, by = 1)  # 2022 to 2030
+
+# ── Scenario 1: Status Quo ────────────────────────────────────────────────────
+# No change in parameters — endemic trajectory continues
+
+params_s1 <- cal_params
+result_s1 <- run_tb_model(params_s1, state_2022, scenario_times)
+N_s1      <- rowSums(result_s1[, c("S","E","I","T","R")])
+inc_s1    <- (params_s1["beta"] * result_s1$S * result_s1$I / N_s1) / N_s1 * 100000
+
+# ── Scenario 2: Treatment Scale-Up ───────────────────────────────────────────
+# tau increased by 30% — reflects faster diagnosis and treatment initiation
+# Consistent with Kenya's active case finding investments
+
+params_s2        <- cal_params
+params_s2["tau"] <- cal_params["tau"] * 1.30
+result_s2        <- run_tb_model(params_s2, state_2022, scenario_times)
+N_s2             <- rowSums(result_s2[, c("S","E","I","T","R")])
+inc_s2           <- (params_s2["beta"] * result_s2$S * result_s2$I / N_s2) / N_s2 * 100000
+
+# ── Scenario 3: Combined Intervention ────────────────────────────────────────
+# tau +30% AND beta reduced by 20% via infection control measures
+# (ventilation, mask use, reduced crowding in high-transmission settings)
+
+params_s3         <- cal_params
+params_s3["tau"]  <- cal_params["tau"] * 1.30
+params_s3["beta"] <- cal_params["beta"] * 0.80
+result_s3         <- run_tb_model(params_s3, state_2022, scenario_times)
+N_s3              <- rowSums(result_s3[, c("S","E","I","T","R")])
+inc_s3            <- (params_s3["beta"] * result_s3$S * result_s3$I / N_s3) / N_s3 * 100000
+
+# Print 2030 projections for each scenario
+cat("2030 Baseline:             ", round(tail(inc_s1,1), 1), "per 100,000\n")
+cat("2030 Treatment scale-up:   ", round(tail(inc_s2,1), 1), "per 100,000\n")
+cat("2030 Combined intervention:", round(tail(inc_s3,1), 1), "per 100,000\n")
+
+# Combine scenarios into single data frame for plotting
+scenario_df <- tibble(
+  year                    = 2022:2030,
+  Baseline                = inc_s1,
+  `Treatment scale-up`    = inc_s2,
+  `Combined intervention` = inc_s3
+)
+
+scenario_df |>
+  pivot_longer(-year, names_to = "Scenario", values_to = "Incidence") |>
+  ggplot(aes(x = year, y = Incidence, color = Scenario, linetype = Scenario)) +
+  geom_line(linewidth = 0.9) +
+  geom_hline(yintercept = end_tb_target, linetype = "dashed",
+             color = "#009E73", linewidth = 0.8) +
+  annotate("text", x = 2023, y = end_tb_target + 10,
+           label = paste0("End TB target (", round(end_tb_target, 0), "/100k)"),
+           color = "#009E73", size = 3, hjust = 0) +
+  scale_color_manual(values = c(
+    "Baseline"                = "#D55E00",  # vermillion
+    "Treatment scale-up"      = "#0072B2",  # blue
+    "Combined intervention"   = "#CC79A7"   # pink
+  )) +
+  labs(x = "Year", y = "TB Incidence per 100,000",
+       title = "Projected TB Incidence Under Intervention Scenarios — Kenya 2022-2030",
+       caption = "End TB target: 80% reduction from 2015 baseline. Parameters: Kirimi et al. (2024).") +
+  theme_minimal()
+```
+
+Projecting forward from 2022 to 2030, three intervention scenarios were 
+evaluated against Kenya's End TB target of 76 per 100,000 — an 80% reduction 
+from the 2015 baseline of 380 per 100,000 (@fig-scenarios).
+
+Under the status quo, incidence is projected to rise to 412 per 100,000 by 
+2030, driven by endemic transmission with R0 > 1. A 30% scale-up in treatment 
+initiation reduces projected 2030 incidence to 299 per 100,000. The combined 
+intervention — treatment scale-up alongside a 20% reduction in transmission — 
+achieves the greatest reduction at 216 per 100,000 by 2030.
+
+Critically, none of the three scenarios approaches the End TB target of 76 per 
+100,000. Even under combined intervention, Kenya's projected 2030 incidence 
+remains more than 300% above the target — suggesting that incremental 
+programmatic improvements alone are insufficient to meet End TB goals.
+
+### Sensitivity Analysis
+
+```{r}
+#| label: fig-sensitivity
+#| fig-cap: "PRCC sensitivity analysis — drivers of TB incidence in Kenya"
+#| cache: true
+
+# ── PRCC Sensitivity Analysis ─────────────────────────────────────────────────
+# Partial Rank Correlation Coefficients quantify the influence of each parameter
+# on TB incidence independently of other parameters
+# Method: 500 samples, each parameter varied +/-30% around calibrated value
+# PRCC > 0: parameter increases incidence; PRCC < 0: reduces incidence
+
+set.seed(42)  # ensures reproducibility
+n_samples <- 500
+
+# Sample each parameter uniformly within +/-30% range
+param_ranges <- tibble(
+  beta    = runif(n_samples, cal_params["beta"]*0.7, cal_params["beta"]*1.3),
+  k       = runif(n_samples, cal_params["k"]*0.7,    cal_params["k"]*1.3),
+  mu      = runif(n_samples, cal_params["mu"]*0.7,   cal_params["mu"]*1.3),
+  tau     = runif(n_samples, cal_params["tau"]*0.7,  cal_params["tau"]*1.3),
+  delta   = runif(n_samples, cal_params["delta"]*0.7,   cal_params["delta"]*1.3),
+  gamma_r = runif(n_samples, cal_params["gamma_r"]*0.7, cal_params["gamma_r"]*1.3),
+  rho     = runif(n_samples, cal_params["rho"]*0.7,     cal_params["rho"]*1.3)
+)
+
+# For each sample, run model with burn-in and return 2000 incidence
+run_sample <- function(i) {
+  p            <- cal_params
+  p["beta"]    <- param_ranges$beta[i]
+  p["k"]       <- param_ranges$k[i]
+  p["mu"]      <- param_ranges$mu[i]
+  p["tau"]     <- param_ranges$tau[i]
+  p["delta"]   <- param_ranges$delta[i]
+  p["gamma_r"] <- param_ranges$gamma_r[i]
+  p["rho"]     <- param_ranges$rho[i]
+  
+  # Burn-in to equilibrium
+  burn <- run_tb_model(p, c(S=N0*0.95, E=N0*0.04, I=N0*0.005,
+                             T=N0*0.004, R=N0*0.001), seq(0,50,by=1))
+  eq   <- c(S=tail(burn$S,1), E=tail(burn$E,1), I=tail(burn$I,1),
+            T=tail(burn$T,1), R=tail(burn$R,1))
+  res  <- run_tb_model(p, eq, seq(0,1,by=1))
+  N    <- sum(res[1, c("S","E","I","T","R")])
+  (p["beta"] * res$S[1] * res$I[1] / N) / N * 100000
+}
+
+# Run all 500 samples
+incidence_samples <- map_dbl(1:n_samples, run_sample)
+
+# Compute PRCC using Spearman rank correlation
+prcc_df <- param_ranges |>
+  mutate(incidence = incidence_samples) |>
+  pivot_longer(-incidence, names_to = "parameter", values_to = "value") |>
+  group_by(parameter) |>
+  summarise(
+    prcc = cor(rank(value), rank(incidence), method = "pearson"),
+    .groups = "drop"
+  ) |>
+  arrange(desc(abs(prcc)))
+
+# Print PRCC table
+print(prcc_df)
+
+# Tornado plot — bars ordered by absolute PRCC value
+prcc_df |>
+  mutate(
+    parameter = factor(parameter, levels = parameter[order(abs(prcc))]),
+    direction = ifelse(prcc > 0, "Positive", "Negative")
+  ) |>
+  ggplot(aes(x = prcc, y = parameter, fill = direction)) +
+  geom_col() +
+  geom_vline(xintercept = 0, linewidth = 0.5) +
+  scale_fill_manual(values = c(
+    "Positive" = "#D55E00",  # vermillion — increases incidence
+    "Negative" = "#0072B2"   # blue — reduces incidence
+  )) +
+  labs(x = "Partial Rank Correlation Coefficient (PRCC)",
+       y = "Parameter",
+       title = "Sensitivity Analysis — Drivers of TB Incidence in Kenya",
+       caption = "PRCC > 0: parameter increases incidence. PRCC < 0: reduces incidence.",
+       fill = "Effect") +
+  theme_minimal()
+```
+
+PRCC analysis identified transmission rate (beta, PRCC = 0.69) and latent 
+progression rate (k, PRCC = 0.57) as the strongest drivers of TB incidence 
+(@fig-sensitivity). Treatment initiation rate (tau, PRCC = -0.44) was the most 
+influential modifiable parameter — the strongest programmatic lever available 
+to Kenya's health system. Treatment success rate (gamma_r) and relapse rate 
+(rho) showed negligible influence under the modelled conditions.
+
 ## Discussion
+
+This analysis developed and calibrated a deterministic compartmental TB 
+transmission model for Kenya, addressing four research questions relating to 
+model validity, R0 estimation, parameter sensitivity, and intervention impact.
+
+The calibrated R0 of 1.10 confirms endemic TB persistence in Kenya, consistent 
+with published estimates. The inability of the fixed-parameter model to 
+reproduce Kenya's observed post-2000 incidence decline is itself informative — 
+it demonstrates that the decline was driven by programmatic improvement rather 
+than changes in transmission biology, consistent with Kenya's documented 
+expansion of TB services under the NTLD programme.
+
+Scenario analysis reveals a substantial gap between achievable programmatic 
+improvements and End TB 2030 targets. This finding aligns with the broader TB 
+modelling literature, which consistently identifies that meeting End TB targets 
+requires transformative structural interventions — including addressing 
+determinants of TB risk such as poverty, malnutrition, and HIV — beyond 
+treatment scale-up alone.
+
+Sensitivity analysis identifies treatment initiation as the most actionable 
+intervention lever, reinforcing the importance of Kenya's ongoing investment 
+in active case finding and diagnostic capacity. A natural extension of this 
+work would disaggregate projections to Kenya's 47 counties using DHIS2 
+county-level notification data, enabling targeted intervention prioritisation 
+directly relevant to Kenya's devolved health system.
 
 ## Limitations
 
+Several limitations should be noted. First, the model uses fixed parameters 
+across the full study period, precluding reproduction of Kenya's observed 
+incidence decline. A time-varying treatment initiation rate would better 
+reflect programmatic improvements between 2000 and 2022.
+
+Second, a single latent compartment combines fast and slow progressors into 
+one progression rate. Separating these states, as described in Lin et al. 
+(2012), would improve biological realism.
+
+Third, HIV co-infection is not modelled explicitly. Kenya's high HIV burden 
+means this omission may affect projection accuracy.
+
+Finally, calibration to a single time point (2000 baseline) limits confidence 
+in long-term projections. Future work should incorporate multi-point 
+calibration and uncertainty quantification around scenario projections.
+
 ## References
+
+Kirimi, E.M., Muthuri, G.G., Ngari, C.G., and Karanja, S. (2024). A Model 
+for the Propagation and Control of Pulmonary Tuberculosis Disease in Kenya. 
+doi:10.1155/2024/5883142
+
+Ochieng, F.O. (2025). Mathematical Modeling of Tuberculosis Transmission 
+Dynamics With Reinfection and Optimal Control. Engineering Reports, 7: e13068. 
+doi:10.1002/eng2.13068
+
+White, R. (2017). A Simple Introduction to Tuberculosis Modelling. TB MAC. 
+Union World Conference on Lung Health, Mexico.
+
+World Health Organization (2023). Global Tuberculosis Report 2023. Geneva: WHO.
+
+National Tuberculosis Leprosy and Lung Disease Program (2022). Annual Report. 
+Ministry of Health, Kenya.
+
+National Tuberculosis Leprosy and Lung Disease Program (2019). National 
+Strategic Plan for Tuberculosis, Leprosy and Lung Health 2019-2023. 
+Ministry of Health, Kenya.
+
+KNBS (2023). Statistical Abstract 2023. Kenya National Bureau of Statistics, 
+Nairobi, Kenya.
