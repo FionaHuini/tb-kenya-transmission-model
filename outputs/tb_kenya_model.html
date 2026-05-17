@@ -2575,8 +2575,21 @@ Figure 1: Baseline TB compartment dynamics using literature parameters (Kirimi 
 <span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Year&quot;</span>, <span class="at">y =</span> <span class="st">&quot;TB Incidence per 100,000&quot;</span>,</span>
 <span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&quot;Modelled vs Observed TB Incidence — Kenya 2000-2022&quot;</span>,</span>
 <span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>       <span class="at">caption =</span> <span class="st">&quot;Observed: WHO Global TB Report. Modelled: SETR model, beta calibrated to 2000 baseline.&quot;</span>) <span class="sc">+</span></span>
-<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a><span class="co"># ── RMSE Calculation ──────────────────────────────────────────────────────────</span></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a><span class="co"># Root Mean Square Error between modeled and observed incidence 2000-2022</span></span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a><span class="co"># RMSE quantifies average deviation across all years</span></span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: high RMSE expected — fixed-parameter model cannot reproduce</span></span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a><span class="co"># programme-driven decline; RMSE captures this limitation quantitatively</span></span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>rmse <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>((fit_df<span class="sc">$</span>modeled <span class="sc">-</span> fit_df<span class="sc">$</span>observed)<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;RMSE (modeled vs observed, 2000-2022):&quot;</span>, <span class="fu">round</span>(rmse, <span class="dv">1</span>), </span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;per 100,000</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
+<div class="cell-output cell-output-stdout">
+<pre><code>RMSE (modeled vs observed, 2000-2022): 129.5 per 100,000</code></pre>
+</div>
 <div class="cell-output-display">
 <div id="fig-fit" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -2598,115 +2611,115 @@ Figure 2: Modelled vs observed TB incidence — Kenya 2000-2022
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ── End TB Target ─────────────────────────────────────────────────────────────</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># WHO End TB Strategy: 80% reduction in incidence from 2015 baseline by 2030</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>baseline_2015 <span class="ot">&lt;-</span> observed <span class="sc">|&gt;</span> <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2015</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(e_inc_100k)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>end_tb_target <span class="ot">&lt;-</span> baseline_2015 <span class="sc">*</span> <span class="fl">0.20</span>  <span class="co"># 80% reduction</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;2015 baseline incidence:&quot;</span>, baseline_2015, <span class="st">&quot;per 100,000</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ── End TB Target ─────────────────────────────────────────────────────────────</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># WHO End TB Strategy: 80% reduction in incidence from 2015 baseline by 2030</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>baseline_2015 <span class="ot">&lt;-</span> observed <span class="sc">|&gt;</span> <span class="fu">filter</span>(year <span class="sc">==</span> <span class="dv">2015</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(e_inc_100k)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>end_tb_target <span class="ot">&lt;-</span> baseline_2015 <span class="sc">*</span> <span class="fl">0.20</span>  <span class="co"># 80% reduction</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;2015 baseline incidence:&quot;</span>, baseline_2015, <span class="st">&quot;per 100,000</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>2015 baseline incidence: 380 per 100,000</code></pre>
 </div>
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;End TB 2030 target:     &quot;</span>, <span class="fu">round</span>(end_tb_target, <span class="dv">1</span>), <span class="st">&quot;per 100,000</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;End TB 2030 target:     &quot;</span>, <span class="fu">round</span>(end_tb_target, <span class="dv">1</span>), <span class="st">&quot;per 100,000</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>End TB 2030 target:      76 per 100,000</code></pre>
 </div>
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ── 2022 Starting State ───────────────────────────────────────────────────────</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Project from equilibrium through 2022 to get starting conditions for scenarios</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>burn_2022  <span class="ot">&lt;-</span> <span class="fu">run_tb_model</span>(cal_params, eq_state, <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">22</span>, <span class="at">by =</span> <span class="dv">1</span>))</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>state_2022 <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">S =</span> <span class="fu">tail</span>(burn_2022<span class="sc">$</span>S, <span class="dv">1</span>), <span class="at">E =</span> <span class="fu">tail</span>(burn_2022<span class="sc">$</span>E, <span class="dv">1</span>),</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">I =</span> <span class="fu">tail</span>(burn_2022<span class="sc">$</span>I, <span class="dv">1</span>), <span class="at">T =</span> <span class="fu">tail</span>(burn_2022<span class="sc">$</span>T, <span class="dv">1</span>),</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">R =</span> <span class="fu">tail</span>(burn_2022<span class="sc">$</span>R, <span class="dv">1</span>)</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>scenario_times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">8</span>, <span class="at">by =</span> <span class="dv">1</span>)  <span class="co"># 2022 to 2030</span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Scenario 1: Status Quo ────────────────────────────────────────────────────</span></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="co"># No change in parameters — endemic trajectory continues</span></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>params_s1 <span class="ot">&lt;-</span> cal_params</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>result_s1 <span class="ot">&lt;-</span> <span class="fu">run_tb_model</span>(params_s1, state_2022, scenario_times)</span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>N_s1      <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(result_s1[, <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>,<span class="st">&quot;E&quot;</span>,<span class="st">&quot;I&quot;</span>,<span class="st">&quot;T&quot;</span>,<span class="st">&quot;R&quot;</span>)])</span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>inc_s1    <span class="ot">&lt;-</span> (params_s1[<span class="st">&quot;beta&quot;</span>] <span class="sc">*</span> result_s1<span class="sc">$</span>S <span class="sc">*</span> result_s1<span class="sc">$</span>I <span class="sc">/</span> N_s1) <span class="sc">/</span> N_s1 <span class="sc">*</span> <span class="dv">100000</span></span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Scenario 2: Treatment Scale-Up ───────────────────────────────────────────</span></span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a><span class="co"># tau increased by 30% — reflects faster diagnosis and treatment initiation</span></span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Consistent with Kenya&#39;s active case finding investments</span></span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>params_s2        <span class="ot">&lt;-</span> cal_params</span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>params_s2[<span class="st">&quot;tau&quot;</span>] <span class="ot">&lt;-</span> cal_params[<span class="st">&quot;tau&quot;</span>] <span class="sc">*</span> <span class="fl">1.30</span></span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>result_s2        <span class="ot">&lt;-</span> <span class="fu">run_tb_model</span>(params_s2, state_2022, scenario_times)</span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>N_s2             <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(result_s2[, <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>,<span class="st">&quot;E&quot;</span>,<span class="st">&quot;I&quot;</span>,<span class="st">&quot;T&quot;</span>,<span class="st">&quot;R&quot;</span>)])</span>
-<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>inc_s2           <span class="ot">&lt;-</span> (params_s2[<span class="st">&quot;beta&quot;</span>] <span class="sc">*</span> result_s2<span class="sc">$</span>S <span class="sc">*</span> result_s2<span class="sc">$</span>I <span class="sc">/</span> N_s2) <span class="sc">/</span> N_s2 <span class="sc">*</span> <span class="dv">100000</span></span>
-<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Scenario 3: Combined Intervention ────────────────────────────────────────</span></span>
-<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a><span class="co"># tau +30% AND beta reduced by 20% via infection control measures</span></span>
-<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a><span class="co"># (ventilation, mask use, reduced crowding in high-transmission settings)</span></span>
-<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>params_s3         <span class="ot">&lt;-</span> cal_params</span>
-<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>params_s3[<span class="st">&quot;tau&quot;</span>]  <span class="ot">&lt;-</span> cal_params[<span class="st">&quot;tau&quot;</span>] <span class="sc">*</span> <span class="fl">1.30</span></span>
-<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>params_s3[<span class="st">&quot;beta&quot;</span>] <span class="ot">&lt;-</span> cal_params[<span class="st">&quot;beta&quot;</span>] <span class="sc">*</span> <span class="fl">0.80</span></span>
-<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>result_s3         <span class="ot">&lt;-</span> <span class="fu">run_tb_model</span>(params_s3, state_2022, scenario_times)</span>
-<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>N_s3              <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(result_s3[, <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>,<span class="st">&quot;E&quot;</span>,<span class="st">&quot;I&quot;</span>,<span class="st">&quot;T&quot;</span>,<span class="st">&quot;R&quot;</span>)])</span>
-<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a>inc_s3            <span class="ot">&lt;-</span> (params_s3[<span class="st">&quot;beta&quot;</span>] <span class="sc">*</span> result_s3<span class="sc">$</span>S <span class="sc">*</span> result_s3<span class="sc">$</span>I <span class="sc">/</span> N_s3) <span class="sc">/</span> N_s3 <span class="sc">*</span> <span class="dv">100000</span></span>
-<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Print 2030 projections for each scenario</span></span>
-<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;2030 Baseline:             &quot;</span>, <span class="fu">round</span>(<span class="fu">tail</span>(inc_s1,<span class="dv">1</span>), <span class="dv">1</span>), <span class="st">&quot;per 100,000</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ── 2022 Starting State ───────────────────────────────────────────────────────</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Project from equilibrium through 2022 to get starting conditions for scenarios</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>burn_2022  <span class="ot">&lt;-</span> <span class="fu">run_tb_model</span>(cal_params, eq_state, <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">22</span>, <span class="at">by =</span> <span class="dv">1</span>))</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>state_2022 <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">S =</span> <span class="fu">tail</span>(burn_2022<span class="sc">$</span>S, <span class="dv">1</span>), <span class="at">E =</span> <span class="fu">tail</span>(burn_2022<span class="sc">$</span>E, <span class="dv">1</span>),</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">I =</span> <span class="fu">tail</span>(burn_2022<span class="sc">$</span>I, <span class="dv">1</span>), <span class="at">T =</span> <span class="fu">tail</span>(burn_2022<span class="sc">$</span>T, <span class="dv">1</span>),</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">R =</span> <span class="fu">tail</span>(burn_2022<span class="sc">$</span>R, <span class="dv">1</span>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>scenario_times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">8</span>, <span class="at">by =</span> <span class="dv">1</span>)  <span class="co"># 2022 to 2030</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Scenario 1: Status Quo ────────────────────────────────────────────────────</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co"># No change in parameters — endemic trajectory continues</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>params_s1 <span class="ot">&lt;-</span> cal_params</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>result_s1 <span class="ot">&lt;-</span> <span class="fu">run_tb_model</span>(params_s1, state_2022, scenario_times)</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>N_s1      <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(result_s1[, <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>,<span class="st">&quot;E&quot;</span>,<span class="st">&quot;I&quot;</span>,<span class="st">&quot;T&quot;</span>,<span class="st">&quot;R&quot;</span>)])</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>inc_s1    <span class="ot">&lt;-</span> (params_s1[<span class="st">&quot;beta&quot;</span>] <span class="sc">*</span> result_s1<span class="sc">$</span>S <span class="sc">*</span> result_s1<span class="sc">$</span>I <span class="sc">/</span> N_s1) <span class="sc">/</span> N_s1 <span class="sc">*</span> <span class="dv">100000</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Scenario 2: Treatment Scale-Up ───────────────────────────────────────────</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="co"># tau increased by 30% — reflects faster diagnosis and treatment initiation</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Consistent with Kenya&#39;s active case finding investments</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>params_s2        <span class="ot">&lt;-</span> cal_params</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>params_s2[<span class="st">&quot;tau&quot;</span>] <span class="ot">&lt;-</span> cal_params[<span class="st">&quot;tau&quot;</span>] <span class="sc">*</span> <span class="fl">1.30</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>result_s2        <span class="ot">&lt;-</span> <span class="fu">run_tb_model</span>(params_s2, state_2022, scenario_times)</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>N_s2             <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(result_s2[, <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>,<span class="st">&quot;E&quot;</span>,<span class="st">&quot;I&quot;</span>,<span class="st">&quot;T&quot;</span>,<span class="st">&quot;R&quot;</span>)])</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>inc_s2           <span class="ot">&lt;-</span> (params_s2[<span class="st">&quot;beta&quot;</span>] <span class="sc">*</span> result_s2<span class="sc">$</span>S <span class="sc">*</span> result_s2<span class="sc">$</span>I <span class="sc">/</span> N_s2) <span class="sc">/</span> N_s2 <span class="sc">*</span> <span class="dv">100000</span></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Scenario 3: Combined Intervention ────────────────────────────────────────</span></span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a><span class="co"># tau +30% AND beta reduced by 20% via infection control measures</span></span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a><span class="co"># (ventilation, mask use, reduced crowding in high-transmission settings)</span></span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a>params_s3         <span class="ot">&lt;-</span> cal_params</span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a>params_s3[<span class="st">&quot;tau&quot;</span>]  <span class="ot">&lt;-</span> cal_params[<span class="st">&quot;tau&quot;</span>] <span class="sc">*</span> <span class="fl">1.30</span></span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a>params_s3[<span class="st">&quot;beta&quot;</span>] <span class="ot">&lt;-</span> cal_params[<span class="st">&quot;beta&quot;</span>] <span class="sc">*</span> <span class="fl">0.80</span></span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a>result_s3         <span class="ot">&lt;-</span> <span class="fu">run_tb_model</span>(params_s3, state_2022, scenario_times)</span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a>N_s3              <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(result_s3[, <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>,<span class="st">&quot;E&quot;</span>,<span class="st">&quot;I&quot;</span>,<span class="st">&quot;T&quot;</span>,<span class="st">&quot;R&quot;</span>)])</span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a>inc_s3            <span class="ot">&lt;-</span> (params_s3[<span class="st">&quot;beta&quot;</span>] <span class="sc">*</span> result_s3<span class="sc">$</span>S <span class="sc">*</span> result_s3<span class="sc">$</span>I <span class="sc">/</span> N_s3) <span class="sc">/</span> N_s3 <span class="sc">*</span> <span class="dv">100000</span></span>
+<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Print 2030 projections for each scenario</span></span>
+<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;2030 Baseline:             &quot;</span>, <span class="fu">round</span>(<span class="fu">tail</span>(inc_s1,<span class="dv">1</span>), <span class="dv">1</span>), <span class="st">&quot;per 100,000</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>2030 Baseline:              411.7 per 100,000</code></pre>
 </div>
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;2030 Treatment scale-up:   &quot;</span>, <span class="fu">round</span>(<span class="fu">tail</span>(inc_s2,<span class="dv">1</span>), <span class="dv">1</span>), <span class="st">&quot;per 100,000</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;2030 Treatment scale-up:   &quot;</span>, <span class="fu">round</span>(<span class="fu">tail</span>(inc_s2,<span class="dv">1</span>), <span class="dv">1</span>), <span class="st">&quot;per 100,000</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>2030 Treatment scale-up:    299.3 per 100,000</code></pre>
 </div>
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;2030 Combined intervention:&quot;</span>, <span class="fu">round</span>(<span class="fu">tail</span>(inc_s3,<span class="dv">1</span>), <span class="dv">1</span>), <span class="st">&quot;per 100,000</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;2030 Combined intervention:&quot;</span>, <span class="fu">round</span>(<span class="fu">tail</span>(inc_s3,<span class="dv">1</span>), <span class="dv">1</span>), <span class="st">&quot;per 100,000</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>2030 Combined intervention: 216.4 per 100,000</code></pre>
 </div>
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine scenarios into single data frame for plotting</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>scenario_df <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">year                    =</span> <span class="dv">2022</span><span class="sc">:</span><span class="dv">2030</span>,</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Baseline                =</span> inc_s1,</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Treatment scale-up</span><span class="st">`</span>    <span class="ot">=</span> inc_s2,</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Combined intervention</span><span class="st">`</span> <span class="ot">=</span> inc_s3</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>scenario_df <span class="sc">|&gt;</span></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>year, <span class="at">names_to =</span> <span class="st">&quot;Scenario&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;Incidence&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> Incidence, <span class="at">color =</span> Scenario, <span class="at">linetype =</span> Scenario)) <span class="sc">+</span></span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> end_tb_target, <span class="at">linetype =</span> <span class="st">&quot;dashed&quot;</span>,</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">&quot;#009E73&quot;</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">2023</span>, <span class="at">y =</span> end_tb_target <span class="sc">+</span> <span class="dv">10</span>,</span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">&quot;End TB target (&quot;</span>, <span class="fu">round</span>(end_tb_target, <span class="dv">0</span>), <span class="st">&quot;/100k)&quot;</span>),</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>           <span class="at">color =</span> <span class="st">&quot;#009E73&quot;</span>, <span class="at">size =</span> <span class="dv">3</span>, <span class="at">hjust =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(</span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Baseline&quot;</span>                <span class="ot">=</span> <span class="st">&quot;#D55E00&quot;</span>,  <span class="co"># vermillion</span></span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Treatment scale-up&quot;</span>      <span class="ot">=</span> <span class="st">&quot;#0072B2&quot;</span>,  <span class="co"># blue</span></span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Combined intervention&quot;</span>   <span class="ot">=</span> <span class="st">&quot;#CC79A7&quot;</span>   <span class="co"># pink</span></span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Year&quot;</span>, <span class="at">y =</span> <span class="st">&quot;TB Incidence per 100,000&quot;</span>,</span>
-<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&quot;Projected TB Incidence Under Intervention Scenarios — Kenya 2022-2030&quot;</span>,</span>
-<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>       <span class="at">caption =</span> <span class="st">&quot;End TB target: 80% reduction from 2015 baseline. Parameters: Kirimi et al. (2024).&quot;</span>) <span class="sc">+</span></span>
-<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine scenarios into single data frame for plotting</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>scenario_df <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">year                    =</span> <span class="dv">2022</span><span class="sc">:</span><span class="dv">2030</span>,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Baseline                =</span> inc_s1,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Treatment scale-up</span><span class="st">`</span>    <span class="ot">=</span> inc_s2,</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Combined intervention</span><span class="st">`</span> <span class="ot">=</span> inc_s3</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>scenario_df <span class="sc">|&gt;</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>year, <span class="at">names_to =</span> <span class="st">&quot;Scenario&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;Incidence&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> Incidence, <span class="at">color =</span> Scenario, <span class="at">linetype =</span> Scenario)) <span class="sc">+</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> end_tb_target, <span class="at">linetype =</span> <span class="st">&quot;dashed&quot;</span>,</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">&quot;#009E73&quot;</span>, <span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="at">x =</span> <span class="dv">2023</span>, <span class="at">y =</span> end_tb_target <span class="sc">+</span> <span class="dv">10</span>,</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>           <span class="at">label =</span> <span class="fu">paste0</span>(<span class="st">&quot;End TB target (&quot;</span>, <span class="fu">round</span>(end_tb_target, <span class="dv">0</span>), <span class="st">&quot;/100k)&quot;</span>),</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>           <span class="at">color =</span> <span class="st">&quot;#009E73&quot;</span>, <span class="at">size =</span> <span class="dv">3</span>, <span class="at">hjust =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Baseline&quot;</span>                <span class="ot">=</span> <span class="st">&quot;#D55E00&quot;</span>,  <span class="co"># vermillion</span></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Treatment scale-up&quot;</span>      <span class="ot">=</span> <span class="st">&quot;#0072B2&quot;</span>,  <span class="co"># blue</span></span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Combined intervention&quot;</span>   <span class="ot">=</span> <span class="st">&quot;#CC79A7&quot;</span>   <span class="co"># pink</span></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Year&quot;</span>, <span class="at">y =</span> <span class="st">&quot;TB Incidence per 100,000&quot;</span>,</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&quot;Projected TB Incidence Under Intervention Scenarios — Kenya 2022-2030&quot;</span>,</span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>       <span class="at">caption =</span> <span class="st">&quot;End TB target: 80% reduction from 2015 baseline. Parameters: Kirimi et al. (2024).&quot;</span>) <span class="sc">+</span></span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-scenarios" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2730,63 +2743,63 @@ Figure 3: Projected TB incidence under three intervention scenarios — Kenya 2
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ── PRCC Sensitivity Analysis ─────────────────────────────────────────────────</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Partial Rank Correlation Coefficients quantify the influence of each parameter</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co"># on TB incidence independently of other parameters</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Method: 500 samples, each parameter varied +/-30% around calibrated value</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co"># PRCC &gt; 0: parameter increases incidence; PRCC &lt; 0: reduces incidence</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)  <span class="co"># ensures reproducibility</span></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>n_samples <span class="ot">&lt;-</span> <span class="dv">500</span></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample each parameter uniformly within +/-30% range</span></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>param_ranges <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta    =</span> <span class="fu">runif</span>(n_samples, cal_params[<span class="st">&quot;beta&quot;</span>]<span class="sc">*</span><span class="fl">0.7</span>, cal_params[<span class="st">&quot;beta&quot;</span>]<span class="sc">*</span><span class="fl">1.3</span>),</span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">k       =</span> <span class="fu">runif</span>(n_samples, cal_params[<span class="st">&quot;k&quot;</span>]<span class="sc">*</span><span class="fl">0.7</span>,    cal_params[<span class="st">&quot;k&quot;</span>]<span class="sc">*</span><span class="fl">1.3</span>),</span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">mu      =</span> <span class="fu">runif</span>(n_samples, cal_params[<span class="st">&quot;mu&quot;</span>]<span class="sc">*</span><span class="fl">0.7</span>,   cal_params[<span class="st">&quot;mu&quot;</span>]<span class="sc">*</span><span class="fl">1.3</span>),</span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">tau     =</span> <span class="fu">runif</span>(n_samples, cal_params[<span class="st">&quot;tau&quot;</span>]<span class="sc">*</span><span class="fl">0.7</span>,  cal_params[<span class="st">&quot;tau&quot;</span>]<span class="sc">*</span><span class="fl">1.3</span>),</span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">delta   =</span> <span class="fu">runif</span>(n_samples, cal_params[<span class="st">&quot;delta&quot;</span>]<span class="sc">*</span><span class="fl">0.7</span>,   cal_params[<span class="st">&quot;delta&quot;</span>]<span class="sc">*</span><span class="fl">1.3</span>),</span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">gamma_r =</span> <span class="fu">runif</span>(n_samples, cal_params[<span class="st">&quot;gamma_r&quot;</span>]<span class="sc">*</span><span class="fl">0.7</span>, cal_params[<span class="st">&quot;gamma_r&quot;</span>]<span class="sc">*</span><span class="fl">1.3</span>),</span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">rho     =</span> <span class="fu">runif</span>(n_samples, cal_params[<span class="st">&quot;rho&quot;</span>]<span class="sc">*</span><span class="fl">0.7</span>,     cal_params[<span class="st">&quot;rho&quot;</span>]<span class="sc">*</span><span class="fl">1.3</span>)</span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a><span class="co"># For each sample, run model with burn-in and return 2000 incidence</span></span>
-<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>run_sample <span class="ot">&lt;-</span> <span class="cf">function</span>(i) {</span>
-<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>  p            <span class="ot">&lt;-</span> cal_params</span>
-<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>  p[<span class="st">&quot;beta&quot;</span>]    <span class="ot">&lt;-</span> param_ranges<span class="sc">$</span>beta[i]</span>
-<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>  p[<span class="st">&quot;k&quot;</span>]       <span class="ot">&lt;-</span> param_ranges<span class="sc">$</span>k[i]</span>
-<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>  p[<span class="st">&quot;mu&quot;</span>]      <span class="ot">&lt;-</span> param_ranges<span class="sc">$</span>mu[i]</span>
-<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>  p[<span class="st">&quot;tau&quot;</span>]     <span class="ot">&lt;-</span> param_ranges<span class="sc">$</span>tau[i]</span>
-<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>  p[<span class="st">&quot;delta&quot;</span>]   <span class="ot">&lt;-</span> param_ranges<span class="sc">$</span>delta[i]</span>
-<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>  p[<span class="st">&quot;gamma_r&quot;</span>] <span class="ot">&lt;-</span> param_ranges<span class="sc">$</span>gamma_r[i]</span>
-<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>  p[<span class="st">&quot;rho&quot;</span>]     <span class="ot">&lt;-</span> param_ranges<span class="sc">$</span>rho[i]</span>
-<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Burn-in to equilibrium</span></span>
-<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>  burn <span class="ot">&lt;-</span> <span class="fu">run_tb_model</span>(p, <span class="fu">c</span>(<span class="at">S=</span>N0<span class="sc">*</span><span class="fl">0.95</span>, <span class="at">E=</span>N0<span class="sc">*</span><span class="fl">0.04</span>, <span class="at">I=</span>N0<span class="sc">*</span><span class="fl">0.005</span>,</span>
-<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>                             <span class="at">T=</span>N0<span class="sc">*</span><span class="fl">0.004</span>, <span class="at">R=</span>N0<span class="sc">*</span><span class="fl">0.001</span>), <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">50</span>,<span class="at">by=</span><span class="dv">1</span>))</span>
-<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>  eq   <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">S=</span><span class="fu">tail</span>(burn<span class="sc">$</span>S,<span class="dv">1</span>), <span class="at">E=</span><span class="fu">tail</span>(burn<span class="sc">$</span>E,<span class="dv">1</span>), <span class="at">I=</span><span class="fu">tail</span>(burn<span class="sc">$</span>I,<span class="dv">1</span>),</span>
-<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a>            <span class="at">T=</span><span class="fu">tail</span>(burn<span class="sc">$</span>T,<span class="dv">1</span>), <span class="at">R=</span><span class="fu">tail</span>(burn<span class="sc">$</span>R,<span class="dv">1</span>))</span>
-<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a>  res  <span class="ot">&lt;-</span> <span class="fu">run_tb_model</span>(p, eq, <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">by=</span><span class="dv">1</span>))</span>
-<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a>  N    <span class="ot">&lt;-</span> <span class="fu">sum</span>(res[<span class="dv">1</span>, <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>,<span class="st">&quot;E&quot;</span>,<span class="st">&quot;I&quot;</span>,<span class="st">&quot;T&quot;</span>,<span class="st">&quot;R&quot;</span>)])</span>
-<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a>  (p[<span class="st">&quot;beta&quot;</span>] <span class="sc">*</span> res<span class="sc">$</span>S[<span class="dv">1</span>] <span class="sc">*</span> res<span class="sc">$</span>I[<span class="dv">1</span>] <span class="sc">/</span> N) <span class="sc">/</span> N <span class="sc">*</span> <span class="dv">100000</span></span>
-<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-42"><a href="#cb23-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Run all 500 samples</span></span>
-<span id="cb23-43"><a href="#cb23-43" aria-hidden="true" tabindex="-1"></a>incidence_samples <span class="ot">&lt;-</span> <span class="fu">map_dbl</span>(<span class="dv">1</span><span class="sc">:</span>n_samples, run_sample)</span>
-<span id="cb23-44"><a href="#cb23-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-45"><a href="#cb23-45" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute PRCC using Spearman rank correlation</span></span>
-<span id="cb23-46"><a href="#cb23-46" aria-hidden="true" tabindex="-1"></a>prcc_df <span class="ot">&lt;-</span> param_ranges <span class="sc">|&gt;</span></span>
-<span id="cb23-47"><a href="#cb23-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">incidence =</span> incidence_samples) <span class="sc">|&gt;</span></span>
-<span id="cb23-48"><a href="#cb23-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>incidence, <span class="at">names_to =</span> <span class="st">&quot;parameter&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;value&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb23-49"><a href="#cb23-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(parameter) <span class="sc">|&gt;</span></span>
-<span id="cb23-50"><a href="#cb23-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb23-51"><a href="#cb23-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">prcc =</span> <span class="fu">cor</span>(<span class="fu">rank</span>(value), <span class="fu">rank</span>(incidence), <span class="at">method =</span> <span class="st">&quot;pearson&quot;</span>),</span>
-<span id="cb23-52"><a href="#cb23-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
-<span id="cb23-53"><a href="#cb23-53" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb23-54"><a href="#cb23-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">abs</span>(prcc)))</span>
-<span id="cb23-55"><a href="#cb23-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-56"><a href="#cb23-56" aria-hidden="true" tabindex="-1"></a><span class="co"># Print PRCC table</span></span>
-<span id="cb23-57"><a href="#cb23-57" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(prcc_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ── PRCC Sensitivity Analysis ─────────────────────────────────────────────────</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Partial Rank Correlation Coefficients quantify the influence of each parameter</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># on TB incidence independently of other parameters</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Method: 500 samples, each parameter varied +/-30% around calibrated value</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co"># PRCC &gt; 0: parameter increases incidence; PRCC &lt; 0: reduces incidence</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)  <span class="co"># ensures reproducibility</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>n_samples <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample each parameter uniformly within +/-30% range</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>param_ranges <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta    =</span> <span class="fu">runif</span>(n_samples, cal_params[<span class="st">&quot;beta&quot;</span>]<span class="sc">*</span><span class="fl">0.7</span>, cal_params[<span class="st">&quot;beta&quot;</span>]<span class="sc">*</span><span class="fl">1.3</span>),</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">k       =</span> <span class="fu">runif</span>(n_samples, cal_params[<span class="st">&quot;k&quot;</span>]<span class="sc">*</span><span class="fl">0.7</span>,    cal_params[<span class="st">&quot;k&quot;</span>]<span class="sc">*</span><span class="fl">1.3</span>),</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">mu      =</span> <span class="fu">runif</span>(n_samples, cal_params[<span class="st">&quot;mu&quot;</span>]<span class="sc">*</span><span class="fl">0.7</span>,   cal_params[<span class="st">&quot;mu&quot;</span>]<span class="sc">*</span><span class="fl">1.3</span>),</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">tau     =</span> <span class="fu">runif</span>(n_samples, cal_params[<span class="st">&quot;tau&quot;</span>]<span class="sc">*</span><span class="fl">0.7</span>,  cal_params[<span class="st">&quot;tau&quot;</span>]<span class="sc">*</span><span class="fl">1.3</span>),</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">delta   =</span> <span class="fu">runif</span>(n_samples, cal_params[<span class="st">&quot;delta&quot;</span>]<span class="sc">*</span><span class="fl">0.7</span>,   cal_params[<span class="st">&quot;delta&quot;</span>]<span class="sc">*</span><span class="fl">1.3</span>),</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">gamma_r =</span> <span class="fu">runif</span>(n_samples, cal_params[<span class="st">&quot;gamma_r&quot;</span>]<span class="sc">*</span><span class="fl">0.7</span>, cal_params[<span class="st">&quot;gamma_r&quot;</span>]<span class="sc">*</span><span class="fl">1.3</span>),</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">rho     =</span> <span class="fu">runif</span>(n_samples, cal_params[<span class="st">&quot;rho&quot;</span>]<span class="sc">*</span><span class="fl">0.7</span>,     cal_params[<span class="st">&quot;rho&quot;</span>]<span class="sc">*</span><span class="fl">1.3</span>)</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a><span class="co"># For each sample, run model with burn-in and return 2000 incidence</span></span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>run_sample <span class="ot">&lt;-</span> <span class="cf">function</span>(i) {</span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>  p            <span class="ot">&lt;-</span> cal_params</span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>  p[<span class="st">&quot;beta&quot;</span>]    <span class="ot">&lt;-</span> param_ranges<span class="sc">$</span>beta[i]</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>  p[<span class="st">&quot;k&quot;</span>]       <span class="ot">&lt;-</span> param_ranges<span class="sc">$</span>k[i]</span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>  p[<span class="st">&quot;mu&quot;</span>]      <span class="ot">&lt;-</span> param_ranges<span class="sc">$</span>mu[i]</span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>  p[<span class="st">&quot;tau&quot;</span>]     <span class="ot">&lt;-</span> param_ranges<span class="sc">$</span>tau[i]</span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>  p[<span class="st">&quot;delta&quot;</span>]   <span class="ot">&lt;-</span> param_ranges<span class="sc">$</span>delta[i]</span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>  p[<span class="st">&quot;gamma_r&quot;</span>] <span class="ot">&lt;-</span> param_ranges<span class="sc">$</span>gamma_r[i]</span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>  p[<span class="st">&quot;rho&quot;</span>]     <span class="ot">&lt;-</span> param_ranges<span class="sc">$</span>rho[i]</span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Burn-in to equilibrium</span></span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>  burn <span class="ot">&lt;-</span> <span class="fu">run_tb_model</span>(p, <span class="fu">c</span>(<span class="at">S=</span>N0<span class="sc">*</span><span class="fl">0.95</span>, <span class="at">E=</span>N0<span class="sc">*</span><span class="fl">0.04</span>, <span class="at">I=</span>N0<span class="sc">*</span><span class="fl">0.005</span>,</span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>                             <span class="at">T=</span>N0<span class="sc">*</span><span class="fl">0.004</span>, <span class="at">R=</span>N0<span class="sc">*</span><span class="fl">0.001</span>), <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">50</span>,<span class="at">by=</span><span class="dv">1</span>))</span>
+<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a>  eq   <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">S=</span><span class="fu">tail</span>(burn<span class="sc">$</span>S,<span class="dv">1</span>), <span class="at">E=</span><span class="fu">tail</span>(burn<span class="sc">$</span>E,<span class="dv">1</span>), <span class="at">I=</span><span class="fu">tail</span>(burn<span class="sc">$</span>I,<span class="dv">1</span>),</span>
+<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a>            <span class="at">T=</span><span class="fu">tail</span>(burn<span class="sc">$</span>T,<span class="dv">1</span>), <span class="at">R=</span><span class="fu">tail</span>(burn<span class="sc">$</span>R,<span class="dv">1</span>))</span>
+<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a>  res  <span class="ot">&lt;-</span> <span class="fu">run_tb_model</span>(p, eq, <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="at">by=</span><span class="dv">1</span>))</span>
+<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a>  N    <span class="ot">&lt;-</span> <span class="fu">sum</span>(res[<span class="dv">1</span>, <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>,<span class="st">&quot;E&quot;</span>,<span class="st">&quot;I&quot;</span>,<span class="st">&quot;T&quot;</span>,<span class="st">&quot;R&quot;</span>)])</span>
+<span id="cb24-39"><a href="#cb24-39" aria-hidden="true" tabindex="-1"></a>  (p[<span class="st">&quot;beta&quot;</span>] <span class="sc">*</span> res<span class="sc">$</span>S[<span class="dv">1</span>] <span class="sc">*</span> res<span class="sc">$</span>I[<span class="dv">1</span>] <span class="sc">/</span> N) <span class="sc">/</span> N <span class="sc">*</span> <span class="dv">100000</span></span>
+<span id="cb24-40"><a href="#cb24-40" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb24-41"><a href="#cb24-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-42"><a href="#cb24-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Run all 500 samples</span></span>
+<span id="cb24-43"><a href="#cb24-43" aria-hidden="true" tabindex="-1"></a>incidence_samples <span class="ot">&lt;-</span> <span class="fu">map_dbl</span>(<span class="dv">1</span><span class="sc">:</span>n_samples, run_sample)</span>
+<span id="cb24-44"><a href="#cb24-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-45"><a href="#cb24-45" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute PRCC using Spearman rank correlation</span></span>
+<span id="cb24-46"><a href="#cb24-46" aria-hidden="true" tabindex="-1"></a>prcc_df <span class="ot">&lt;-</span> param_ranges <span class="sc">|&gt;</span></span>
+<span id="cb24-47"><a href="#cb24-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">incidence =</span> incidence_samples) <span class="sc">|&gt;</span></span>
+<span id="cb24-48"><a href="#cb24-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>incidence, <span class="at">names_to =</span> <span class="st">&quot;parameter&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;value&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb24-49"><a href="#cb24-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(parameter) <span class="sc">|&gt;</span></span>
+<span id="cb24-50"><a href="#cb24-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb24-51"><a href="#cb24-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">prcc =</span> <span class="fu">cor</span>(<span class="fu">rank</span>(value), <span class="fu">rank</span>(incidence), <span class="at">method =</span> <span class="st">&quot;pearson&quot;</span>),</span>
+<span id="cb24-52"><a href="#cb24-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb24-53"><a href="#cb24-53" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb24-54"><a href="#cb24-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">abs</span>(prcc)))</span>
+<span id="cb24-55"><a href="#cb24-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-56"><a href="#cb24-56" aria-hidden="true" tabindex="-1"></a><span class="co"># Print PRCC table</span></span>
+<span id="cb24-57"><a href="#cb24-57" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(prcc_df)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 7 × 2
@@ -2802,25 +2815,25 @@ Figure 3: Projected TB incidence under three intervention scenarios — Kenya 2
 </div>
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tornado plot — bars ordered by absolute PRCC value</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>prcc_df <span class="sc">|&gt;</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">parameter =</span> <span class="fu">factor</span>(parameter, <span class="at">levels =</span> parameter[<span class="fu">order</span>(<span class="fu">abs</span>(prcc))]),</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">direction =</span> <span class="fu">ifelse</span>(prcc <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="st">&quot;Positive&quot;</span>, <span class="st">&quot;Negative&quot;</span>)</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> prcc, <span class="at">y =</span> parameter, <span class="at">fill =</span> direction)) <span class="sc">+</span></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(</span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Positive&quot;</span> <span class="ot">=</span> <span class="st">&quot;#D55E00&quot;</span>,  <span class="co"># vermillion — increases incidence</span></span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Negative&quot;</span> <span class="ot">=</span> <span class="st">&quot;#0072B2&quot;</span>   <span class="co"># blue — reduces incidence</span></span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Partial Rank Correlation Coefficient (PRCC)&quot;</span>,</span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Parameter&quot;</span>,</span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&quot;Sensitivity Analysis — Drivers of TB Incidence in Kenya&quot;</span>,</span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">caption =</span> <span class="st">&quot;PRCC &gt; 0: parameter increases incidence. PRCC &lt; 0: reduces incidence.&quot;</span>,</span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">&quot;Effect&quot;</span>) <span class="sc">+</span></span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tornado plot — bars ordered by absolute PRCC value</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>prcc_df <span class="sc">|&gt;</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">parameter =</span> <span class="fu">factor</span>(parameter, <span class="at">levels =</span> parameter[<span class="fu">order</span>(<span class="fu">abs</span>(prcc))]),</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">direction =</span> <span class="fu">ifelse</span>(prcc <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="st">&quot;Positive&quot;</span>, <span class="st">&quot;Negative&quot;</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> prcc, <span class="at">y =</span> parameter, <span class="at">fill =</span> direction)) <span class="sc">+</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Positive&quot;</span> <span class="ot">=</span> <span class="st">&quot;#D55E00&quot;</span>,  <span class="co"># vermillion — increases incidence</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Negative&quot;</span> <span class="ot">=</span> <span class="st">&quot;#0072B2&quot;</span>   <span class="co"># blue — reduces incidence</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Partial Rank Correlation Coefficient (PRCC)&quot;</span>,</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Parameter&quot;</span>,</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&quot;Sensitivity Analysis — Drivers of TB Incidence in Kenya&quot;</span>,</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">caption =</span> <span class="st">&quot;PRCC &gt; 0: parameter increases incidence. PRCC &lt; 0: reduces incidence.&quot;</span>,</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">&quot;Effect&quot;</span>) <span class="sc">+</span></span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-sensitivity" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2835,7 +2848,7 @@ Figure 4: PRCC sensitivity analysis — drivers of TB incidence in Kenya
 </div>
 </div>
 </div>
-<p>PRCC analysis identified transmission rate (beta, PRCC = 0.69) and latent progression rate (k, PRCC = 0.57) as the strongest drivers of TB incidence (<a href="#fig-sensitivity" class="quarto-xref">Figure 4</a>). Treatment initiation rate (tau, PRCC = -0.44) was the most influential modifiable parameter — the strongest programmatic lever available to Kenya’s health system. Treatment success rate (gamma_r) and relapse rate (rho) showed negligible influence under the modelled conditions.</p>
+<p>PRCC analysis identified transmission rate (beta, PRCC = 0.74) as the strongest driver of TB incidence, followed by treatment initiation rate (tau, PRCC = -0.61) as the most influential modifiable parameter. Latent progression rate (k, PRCC = 0.14) and TB mortality (delta, PRCC = -0.14) showed moderate influence, while treatment success rate (gamma_r) and relapse rate (rho) showed negligible effects</p>
 </section>
 </section>
 <section id="discussion" class="level2">

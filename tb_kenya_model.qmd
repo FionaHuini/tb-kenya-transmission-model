@@ -318,6 +318,16 @@ fit_df |>
        title = "Modelled vs Observed TB Incidence — Kenya 2000-2022",
        caption = "Observed: WHO Global TB Report. Modelled: SETR model, beta calibrated to 2000 baseline.") +
   theme_minimal()
+
+# ── RMSE Calculation ──────────────────────────────────────────────────────────
+# Root Mean Square Error between modeled and observed incidence 2000-2022
+# RMSE quantifies average deviation across all years
+# Note: high RMSE expected — fixed-parameter model cannot reproduce
+# programme-driven decline; RMSE captures this limitation quantitatively
+
+rmse <- sqrt(mean((fit_df$modeled - fit_df$observed)^2))
+cat("RMSE (modeled vs observed, 2000-2022):", round(rmse, 1), 
+    "per 100,000\n")
 ```
 
 The transmission parameter beta was calibrated to Kenya's observed TB incidence 
@@ -522,12 +532,12 @@ prcc_df |>
   theme_minimal()
 ```
 
-PRCC analysis identified transmission rate (beta, PRCC = 0.69) and latent 
-progression rate (k, PRCC = 0.57) as the strongest drivers of TB incidence 
-(@fig-sensitivity). Treatment initiation rate (tau, PRCC = -0.44) was the most 
-influential modifiable parameter — the strongest programmatic lever available 
-to Kenya's health system. Treatment success rate (gamma_r) and relapse rate 
-(rho) showed negligible influence under the modelled conditions.
+PRCC analysis identified transmission rate (beta, PRCC = 0.74) as the 
+strongest driver of TB incidence, followed by treatment initiation rate 
+(tau, PRCC = -0.61) as the most influential modifiable parameter. Latent 
+progression rate (k, PRCC = 0.14) and TB mortality (delta, PRCC = -0.14) 
+showed moderate influence, while treatment success rate (gamma_r) and 
+relapse rate (rho) showed negligible effects
 
 ## Discussion
 
