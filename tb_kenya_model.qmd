@@ -340,6 +340,22 @@ The fixed-parameter model reproduces the 2000 baseline accurately (calibration e
 
 ### Scenario Analysis
 
+
+Intervention scenarios were grounded in Kenya's documented programmatic 
+indicators, mapping real-world programme metrics directly to model parameters:
+
+| Real-World Indicator | Source | Model Parameter |
+|---|---|---|
+| Case detection rate improvement | NTLD Strategic Plan 2019-2023 | tau — treatment initiation rate |
+| GeneXpert scale-up reducing diagnostic delay | Kenya TB Prevalence Survey 2016 | tau — treatment initiation rate |
+| Infection control in congregate settings | WHO End TB Strategy Pillar 2 | beta — transmission rate |
+| Contact tracing expansion | NTLD Annual Report 2022 | beta — transmission rate |
+
+A 30% improvement in tau reflects Kenya's NTLD Strategic Plan 2019-2023 
+target for increased case detection. The 20% reduction in beta represents 
+infection control gains through ventilation improvements and contact tracing 
+in high-transmission settings, consistent with WHO End TB Pillar 2 
+recommendations.
 ```{r}
 #| label: fig-scenarios
 #| fig-cap: "Projected TB incidence under three intervention scenarios — Kenya 2022-2030"
@@ -465,7 +481,7 @@ evaluated against Kenya's End TB target of 76 per 100,000 — an 80% reduction
 from the 2015 baseline of 380 per 100,000 (@fig-scenarios).
 
 Under the status quo, incidence is projected to rise to 412 per 100,000 by 
-2030, driven by endemic transmission with R0 > 1. A 30% scale-up in treatment 
+2030 (95% uncertainty interval reflecting beta parameter uncertainty shown in Figure 3), driven by endemic transmission with R0 > 1. A 30% scale-up in treatment 
 initiation reduces projected 2030 incidence to 299 per 100,000. The combined 
 intervention — treatment scale-up alongside a 20% reduction in transmission — 
 achieves the greatest reduction at 216 per 100,000 by 2030.
