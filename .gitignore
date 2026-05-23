@@ -53,3 +53,4 @@ rsconnect/
 **/*.quarto_ipynb
 .quarto/
 .quarto/
+tb_kenya_model_files/
