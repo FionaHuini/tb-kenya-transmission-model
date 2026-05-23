@@ -320,10 +320,10 @@ indicators, mapping real-world programme metrics directly to model parameters:
 
 | Real-World Indicator | Source | Model Parameter |
 |---|---|---|
-| Case detection rate improvement | NTLD Strategic Plan 2019-2023 | tau — treatment initiation rate |
-| GeneXpert scale-up reducing diagnostic delay | Kenya TB Prevalence Survey 2016 | tau — treatment initiation rate |
-| Infection control in congregate settings | WHO End TB Strategy Pillar 2 | beta — transmission rate |
-| Contact tracing expansion | NTLD Annual Report 2022 | beta — transmission rate |
+| Case detection rate improvement | NTLD Strategic Plan 2019-2023 | tau( treatment initiation rate) |
+| GeneXpert scale-up reducing diagnostic delay | Kenya TB Prevalence Survey 2016 | tau (treatment initiation rate) |
+| Infection control in congregate settings | WHO End TB Strategy Pillar 2 | ( (transmission rate) |
+| Contact tracing expansion | NTLD Annual Report 2022 | beta (transmission rate) |
 
 A 30% improvement in tau reflects Kenya's NTLD Strategic Plan 2019-2023 
 target for increased case detection. The 20% reduction in beta represents 
