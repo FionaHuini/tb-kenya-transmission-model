@@ -13,11 +13,7 @@ format:
 
 ## Background
 
-Tuberculosis (TB) remains a leading cause of infectious disease mortality 
-globally, with Kenya classified among the 30 high TB burden countries by the 
-World Health Organization (WHO). In 2022, Kenya reported an estimated incidence 
-of 268 cases per 100,000 population, with treatment success rates of 
-approximately 87%.
+Tuberculosis (TB) remains a significant public health concern in Kenya, though the country has made notable progress in reducing its burden. Recent efforts in early diagnosis, expanded access to treatment, and community-based TB programs have helped Kenya move out of the “high TB burden” classification for overall TB incidence. In 2025, approximately 90,900 people were diagnosed and started on treatment, highlighting continued challenges in addressing drug-resistant TB and HIV-associated TB, particularly in vulnerable populations.
 
 A key feature of TB epidemiology is the long latent period between initial 
 infection and progression to active disease. Only 5-10% of latently infected 
