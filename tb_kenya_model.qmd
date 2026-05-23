@@ -15,12 +15,7 @@ format:
 
 Tuberculosis (TB) remains a significant public health concern in Kenya, though the country has made notable progress in reducing its burden. Recent efforts in early diagnosis, expanded access to treatment, and community-based TB programs have helped Kenya move out of the “high TB burden” classification for overall TB incidence. In 2025, approximately 90,900 people were diagnosed and started on treatment, highlighting continued challenges in addressing drug-resistant TB and HIV-associated TB, particularly in vulnerable populations.
 
-A key feature of TB epidemiology is the long latent period between initial 
-infection and progression to active disease. Only 5-10% of latently infected 
-individuals develop active TB in their lifetime, with risk elevated by HIV 
-co-infection, malnutrition, and immunosuppression. This latent dynamic makes 
-TB fundamentally different from directly transmitted diseases and requires 
-explicit compartmental representation in transmission models.
+One of the things that makes TB different from many other infectious diseases is its long latent stage. Many people may carry the TB bacteria without becoming sick, and only about 5–10% of infected individuals will develop active TB during their lifetime. The risk becomes much higher in the presence of factors such as HIV co-infection, malnutrition, or weakened immunity. Because of this hidden but important latent phase, TB transmission models need to account for both people with active disease and those who are infected but not yet sick.
 
 Kenya's national TB program operates under the **End TB Strategy**, targeting 
 a 90% reduction in TB deaths and 80% reduction in incidence by 2030 relative 
@@ -33,34 +28,26 @@ intervention scenarios against End TB 2030 targets.
 
 ### Research Questions
 
-This analysis addresses four research questions:
+I had 4 main questions when undertaking this project:
 
 (1) whether a calibrated SEIRS-type model can reproduce Kenya's observed TB 
 incidence trajectory;
 (2) estimation of Kenya's basic reproduction number R0;
 (3) identification of the parameters most strongly driving TB incidence;
-(4) projection of incidence to 2030 under treatment scale-up scenarios, 
-evaluated against End TB targets.
+(4) projection of incidence to 2030 under treatment scale-up scenarios, evaluated against End TB targets.
 
 ## Methods
 
 ### Model Structure
 
-We developed a deterministic compartmental model with five states: Susceptible 
-(S), Latent (E), Infectious (I), On Treatment (T), and Recovered (R). The model 
-accounts for TB's characteristically long latent period and the possibility of 
+I developed a deterministic compartmental model with five states: Susceptible (S), Latent (E), Infectious (I), On Treatment (T), and Recovered (R). The model accounts for TB's characteristically long latent period and the possibility of 
 relapse following recovery.
 
-While many TB models use a standard SEIRS structure, we explicitly model the 
-treatment compartment (T) to reflect Kenya's programmatic context and allow 
-direct calibration to WHO treatment success data. The system of ordinary 
-differential equations (ODEs) is solved numerically using the `deSolve` package.
+While many TB models use a standard SEIRS structure, I explicitly model the treatment compartment (T) to reflect Kenya's programmatic context and allow direct calibration to WHO treatment success data. The system of ordinary differential equations (ODEs) is solved numerically using the `deSolve` package.
 
 ### Model Parameters
 
-Parameters were sourced from Kirimi et al. (2024), a compartmental TB 
-transmission model calibrated to the Kenyan context. The transmission parameter 
-beta was subsequently calibrated to Kenya's observed 2000 baseline incidence. 
+Parameters were sourced from Kirimi et al. (2024), a compartmental TB transmission model calibrated to the Kenyan context. The transmission parameter beta was subsequently calibrated to Kenya's observed 2000 baseline incidence. 
 Background mortality was obtained from the KNBS Statistical Abstract (2023).
 
 ### Setup
@@ -75,8 +62,7 @@ library(deSolve)   # ODE numerical solver
 library(tidyverse) # data wrangling and visualisation
 
 # ── ODE System ───────────────────────────────────────────────────────────────
-# Five compartments: S (susceptible), E (latent), I (infectious),
-# T (on treatment), R (recovered)
+# Five compartments: S (susceptible), E (latent), I (infectious), T (on treatment), R (recovered)
 
 tb_model <- function(t, state, params) {
   with(as.list(c(state, params)), {
