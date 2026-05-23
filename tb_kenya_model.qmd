@@ -17,10 +17,7 @@ Tuberculosis (TB) remains a significant public health concern in Kenya, though t
 
 One of the things that makes TB different from many other infectious diseases is its long latent stage. Many people may carry the TB bacteria without becoming sick, and only about 5–10% of infected individuals will develop active TB during their lifetime. The risk becomes much higher in the presence of factors such as HIV co-infection, malnutrition, or weakened immunity. Because of this hidden but important latent phase, TB transmission models need to account for both people with active disease and those who are infected but not yet sick.
 
-Kenya's national TB program operates under the **End TB Strategy**, targeting 
-a 90% reduction in TB deaths and 80% reduction in incidence by 2030 relative 
-to 2015 baselines. Achieving these targets requires understanding the drivers 
-of transmission and projecting the impact of intervention scale-up.
+Kenya's national TB program operates under the **End TB Strategy**, targeting a 90% reduction in TB deaths and 80% reduction in incidence by 2030 relative to 2015 baselines. Achieving these targets requires understanding the drivers of transmission and projecting the impact of intervention scale-up.
 
 This analysis develops and calibrates a compartmental TB transmission model 
 to Kenya's observed epidemic trajectory (2000-2022) and evaluates three 
@@ -30,8 +27,7 @@ intervention scenarios against End TB 2030 targets.
 
 I had 4 main questions when undertaking this project:
 
-(1) whether a calibrated SEIRS-type model can reproduce Kenya's observed TB 
-incidence trajectory;
+(1) What programmatic lever (treatment initiation, transmission reduction, or combined) offers the greatest potential reduction in Kenya's TB burden by 2030?;
 (2) estimation of Kenya's basic reproduction number R0;
 (3) identification of the parameters most strongly driving TB incidence;
 (4) projection of incidence to 2030 under treatment scale-up scenarios, evaluated against End TB targets.
