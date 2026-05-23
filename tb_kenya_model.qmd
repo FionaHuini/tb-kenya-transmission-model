@@ -312,11 +312,7 @@ cat("RMSE (modeled vs observed, 2000-2022):", round(rmse, 1),
     "per 100,000\n")
 ```
 
-The transmission parameter beta was calibrated to Kenya's observed TB incidence 
-in 2000 (451 per 100,000), yielding a fitted value of beta = 1.06 per year and 
-a basic reproduction number R0 = 1.10. This confirms endemic TB persistence in 
-Kenya, consistent with Ochieng (2025) who estimated R0 = 1.005 using a distinct 
-model structure.
+The transmission parameter beta was calibrated to Kenya's observed TB incidence in 2000 (451 per 100,000), yielding a fitted value of beta = 1.06 per year and a basic reproduction number R0 = 1.10. This confirms endemic TB persistence in Kenya, consistent with Ochieng (2025) who estimated R0 = 1.005 using a distinct model structure.
 
 The fixed-parameter model reproduces the 2000 baseline accurately (calibration error = 0) but diverges from the observed post-2000 decline, yielding a trajectory RMSE of 129.5 per 100,000 across 2000-2022 (Figure 2). This RMSE reflects Kenya's programmatic improvement over the study period rather than model misspecification. A fixed-parameter model is structurally incapable of reproducing a trend driven by time-varying treatment coverage. For context, a naive model predicting the 2000 baseline incidence for all years yields RMSE = 135.6 per 100,000 which is higher than our calibrated model (129.5), confirming that the dynamic model adds predictive value beyond a simple baseline assumption.
 
@@ -586,30 +582,23 @@ requires transformative structural interventions — including addressing
 determinants of TB risk such as poverty, malnutrition, and HIV — beyond 
 treatment scale-up alone.
 
-Sensitivity analysis identifies treatment initiation as the most actionable 
-intervention lever, reinforcing the importance of Kenya's ongoing investment 
-in active case finding and diagnostic capacity. A natural extension of this 
-work would disaggregate projections to Kenya's 47 counties using DHIS2 
-county-level notification data, enabling targeted intervention prioritisation 
-directly relevant to Kenya's devolved health system.
+Sensitivity analysis identifies treatment initiation as the most actionable intervention lever, reinforcing the importance of Kenya's ongoing investment in active case finding and diagnostic capacity. A natural extension of this 
+work would disaggregate projections to Kenya's 47 counties using DHIS2 county-level notification data, enabling targeted intervention prioritisation directly relevant to Kenya's devolved health system.
 
 ## Limitations
 
-Several limitations should be noted. First, the model uses fixed parameters 
+(1) First, the model uses fixed parameters 
 across the full study period, precluding reproduction of Kenya's observed 
 incidence decline. A time-varying treatment initiation rate would better 
 reflect programmatic improvements between 2000 and 2022.
 
-Second, a single latent compartment combines fast and slow progressors into 
+(2) A single latent compartment combines fast and slow progressors into 
 one progression rate. Separating these states, as described in Lin et al. 
 (2012), would improve biological realism.
 
-Third, HIV co-infection is not modelled explicitly. Kenya's high HIV burden 
-means this omission may affect projection accuracy.
+(3)HIV co-infection is not modelled explicitly. Kenya's high HIV burden means this omission may affect projection accuracy.
 
-Finally, calibration to a single time point (2000 baseline) limits confidence 
-in long-term projections. Future work should incorporate multi-point 
-calibration and uncertainty quantification around scenario projections.
+(4)Calibration to a single time point (2000 baseline) limits confidence in long-term projections. 
 
 ## References
 
@@ -621,7 +610,7 @@ Ochieng, F.O. (2025). Mathematical Modeling of Tuberculosis Transmission
 Dynamics With Reinfection and Optimal Control. Engineering Reports, 7: e13068. 
 doi:10.1002/eng2.13068
 
-White, R. (2017). A Simple Introduction to Tuberculosis Modelling. TB MAC. 
+White, R. (2018). A Simple Introduction to Tuberculosis Modelling. TB MAC. 
 Union World Conference on Lung Health, Mexico.
 
 World Health Organization (2023). Global Tuberculosis Report 2023. Geneva: WHO.
